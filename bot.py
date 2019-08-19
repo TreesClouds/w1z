@@ -15,7 +15,7 @@ rqserv = db.doc.find_one({'_id': ObjectId('5d5779523f5cc0f1bdd8511e')})
 mess = db.doc.find_one({'_id': ObjectId('5d5779523f5cc0f1bdd8511f')})
 typ = {}
 version = "1.2.0"
-
+ 
 
 @client.event
 async def on_ready():
