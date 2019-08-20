@@ -15,7 +15,7 @@ rqserv = db.doc.find_one({'_id': ObjectId('5d5779523f5cc0f1bdd8511e')})
 mess = db.doc.find_one({'_id': ObjectId('5d5779523f5cc0f1bdd8511f')})
 slots = db.doc.find_one({'_id': ObjectId('5d5b51f233ba3bc7166344e3')})
 typ = {}
-version = "v1.2.1"
+version = "v1.2.2"
 
 
 @client.event
@@ -155,9 +155,15 @@ async def on_message(message):
                         await message.channel.send(f"""Max slots now **{split[2]}**.""")
                     elif "check" == split[1]:
                         await message.channel.send(f"""There are **{slots["used"]} out of {slots["max"]} slots used.**""")
-                    elif "done" == split[1]:
-                        slots["used"] -= 1
-                        await message.channel.send(f"""Used slots reduced by 1.""")
+                    elif "forceremove" == split[1]:
+                        if slots["used"] > 0:
+                            slots["used"] -= 1
+                            await message.channel.send(f"""Used slots reduced by 1, now {slots["used"]}.""")
+                        else:
+                            await message.channel.send("There are no requests in the queue.")
+                    elif "forceadd" == split[1]:
+                        slots["used"] += 1
+                        await message.channel.send(f"""Forcefully used a slot. Used slots now {slots["used"]}.""")
                 else:
                     await message.channel.send("You do not have the required permissions to use this command.")
             elif lower == "w.emojiupdate":
@@ -170,21 +176,33 @@ async def on_message(message):
                         await channel.send(f"""{emoji} ~ `{emoji.name}`""")
                 else:
                     await message.channel.send("You do not have the required permissions to use this command.")
-            elif "w.request " in message.content:
-                if "delete" in message.content:
-                    if status[message.author.id] > 0:
+            elif "w.request" == split[0]:
+                if "delete" == split[1]:
+                    if status[str(message.author)] > 0:
                         await message.channel.send("Are you sure you would like to delete your request? Your <:blobpoint:577932728033476611> will be refunded. Please `confirm` or `cancel`.")
                         typ[message.author.id] = 5
                     else:
                         message.channel.send("You currently have no active requests to delete.")
-                elif "claim" in message.content:
+                elif "claim" == split[1]:
                     print()
-                elif "submit" in message.content:
+                elif "submit" == split[1]:
                     print()
-                elif "check" in message.content:
+                elif "check" == split[1]:
                     stat = status[str(message.author)]
                     if stat == 1:
-                        print()
+                        await message.channel.send("You have a request in the queue. This command will have more functionality soon.")
+                elif "forcedelete" == split[1]:
+                    admin = guild.get_role(471024426356310028)
+                    if admin in message.author.roles:
+                        user = client.get_user(int(split[2]))
+                        if status[str(user)] > 0:
+                            status[str(user)] = 0
+                            slots["used"] -= 1
+                            await message.channel.send(f"""You have forcefully deleted {str(user)}'s request. You may proceed to delete the message in the queue.""")
+                        else:
+                            await message.channel.send("That user has no request in the queue.")
+                    else:
+                        await message.channel.send("You do not have the required permissions to use this subcommand.")
         elif typ[message.author.id] == 1:
             if "1" in message.content:
                 await message.channel.send("__Great Choice! Now, please state what you would like your blob(s) to look like, or say `cancel`.__")
@@ -260,6 +278,9 @@ async def on_message(message):
             if lower == "confirm":
                 await message.channel.send("<@266319920009183242> will proceed to delete your request and refund your <:blobpoint:577932728033476611>. At this point you may also start a new request.")
                 status[message.author.id] = 0
+                slots["used"] -= 1
+                channel = client.get_channel(471878672677208084)
+                await channel.send(f"""{str(message.author)} has deleted their request.""")
             else:
                 await message.channel.send("That was not a valid response. Please `confirm` or `cancel`.")
 
@@ -288,7 +309,7 @@ async def on_guild_emojis_update(guild0, before, after):
         if emoji.name not in lis2:
             emoadd = emoji
             emoaddname = emoji.name
-    if emoremove == "":  # If no emoji was removed
+    if emoremove == "":  # If an emoji was added
         await channel.send(f"""<:w1:579473596041265152> **Added** {emoadd} `{emoaddname}`""")
     else:  # If an emoji was removed
         if emoadd == "":  # If an emoji was ONLY removed
