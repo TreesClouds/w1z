@@ -14,15 +14,16 @@ rqdesc = db.doc.find_one({'_id': ObjectId('5d5779523f5cc0f1bdd8511d')})
 rqserv = db.doc.find_one({'_id': ObjectId('5d5779523f5cc0f1bdd8511e')})
 mess = db.doc.find_one({'_id': ObjectId('5d5779523f5cc0f1bdd8511f')})
 slots = db.doc.find_one({'_id': ObjectId('5d5b51f233ba3bc7166344e3')})
+
 typ = {}
-version = "v1.2.2"
+version = "v1.2.3"
 
 
 @client.event
 async def on_ready():
     guild = client.get_guild(469591475999604746)
     channel = client.get_channel(612112677166252050)
-    await channel.send(f"""Bot started on **{version}**""")
+    await channel.send(f"""<:bfyYes:613851579266760733> Bot started on **{version}**""")
     await client.change_presence(activity=discord.Activity(name=f"""{guild.member_count} members""", type=discord.ActivityType.watching))
 
 
@@ -50,7 +51,7 @@ async def on_member_remove(member):
 async def on_message(message):
     guild = client.get_guild(469591475999604746)  # Blob-ify
     lower = message.content.lower()
-    split = message.content.split(" ")
+    split = lower.split(" ")
     if message.author.id not in typ.keys():
         typ[message.author.id] = 0
     if str(message.author) not in status.keys():
@@ -61,7 +62,7 @@ async def on_message(message):
         typ[message.author.id] = 0
     if lower == "cancel":
         if typ[message.author.id] > 0:
-            await message.channel.send("**The requested action has been canceled.**")
+            await message.channel.send("<:bfyNo:613851611600781342> **The requested action has been canceled.**")
             typ[message.author.id] = 0
             rqtype[str(message.author)], rqdesc[str(message.author)], rqserv[str(message.author)] = "", "", ""
     elif message.author.id == 292953664492929025:
@@ -70,18 +71,18 @@ async def on_message(message):
             user = str(client.get_user(int(mem[1])))
             if user not in bal.keys():
                 bal[user] = 0
-            await message.channel.send("2 BLOB POINTS have been added to your account.")
+            await message.channel.send("<:bfyYes:613851579266760733> 2 BLOB POINTS have been added to your account.")
             bal[user] += 2
             channel = client.get_channel(471878672677208084)
             await channel.send(f"""**Bank Update:** Bal of {user} now {bal[user]}""")
     else:
         if typ[message.author.id] == 0:
             if lower == "w.help":
-                embed = discord.Embed(title="Blob Bot Help", description="The full list of W1Z4RD's commands")
+                embed = discord.Embed(title="Blob Bot Help", description="The full list of W1Z4RD's commands", color=0x0080c0)
                 embed.add_field(name="w.request", value="Request a blob")
-                embed.add_field(name="w.exchange", value="Exchange 2 BLOB POINTS for 500,000 BLOB COINS")
+                embed.add_field(name="w.exchange", value="Exchange 2 BLOB POINTS for 2,500 BLOB COINS")
                 embed.add_field(name="w.balance", value="Check your BLOB POINT balance")
-                embed.add_field(name="w.req delete", value="Delete your current blob request")
+                embed.add_field(name="w.request delete", value="Delete your current blob request")
                 embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/470304317748805652/581650589423763463/wiz.png")
                 embed.set_footer(text=f"""Created by Tri#4823 ~ W1Z4RD {version}""")
                 await message.channel.send(content=None, embed=embed)
@@ -90,25 +91,25 @@ async def on_message(message):
                 if mem not in bal.keys():
                     bal[mem] = 0
                 if bal[mem] > 1:
-                    await message.channel.send("<@266319920009183242> will complete the transaction within 24 hours.")
+                    await message.channel.send("<:bfyYes:613851579266760733> <@266319920009183242> will complete the transaction within 24 hours.")
                     bal[mem] -= 2
                     channel = client.get_channel(471878672677208084)
                     await channel.send(f"""**Bank Update:** Bal of {mem} now {bal[mem]}""")
                 else:
-                    await message.channel.send("You do not have enough BLOB POINTS to do so.")
+                    await message.channel.send("<:bfyNo:613851611600781342> You do not have enough BLOB POINTS to do so.")
             elif lower == "w.request":
-                if slots["used"] < slots["max"]:
+                if slots["used"] < slots["max"] or guild.get_role(600678332320710666) in message.author.roles:
                     if status[str(message.author)] == 0:
-                        embed = discord.Embed(title="W1Z Request Command", description="A full list of all blob types!")
+                        embed = discord.Embed(title="W1Z Request Command", description="A full list of all blob types!", color=0x0080c0)
                         embed.set_image(url="https://cdn.discordapp.com/attachments/470304317748805652/586383366538919965/d6783672-991f-4235-b3a6-b48b4d63eb5d.png")
                         embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/470304317748805652/581650589423763463/wiz.png")
                         embed.set_footer(text=f"""Created by Tri#4823 ~ W1Z4RD {version}""")
-                        await message.channel.send(content="__Please respond with the respective number, or say `cancel`__", embed=embed)
+                        await message.channel.send(content="__Please respond with the respective number, or `cancel`__", embed=embed)
                         typ[message.author.id] += 1
                     else:
-                        await message.channel.send("You currently have a request in the queue. Either wait until the request is done or delete your request to request again. You can also choose to edit your request.")
+                        await message.channel.send("<:bfyNo:613851611600781342> You currently have a request in the queue. Either wait until the request is done or delete your request to request again. You can also choose to edit your request.")
                 else:
-                    await message.channel.send("The maximum amount of request slots has been reached. Either wait for a slot to open or boost the server to bypass this.")
+                    await message.channel.send("<:bfyNo:613851611600781342> The maximum amount of request slots has been reached. Either wait for a slot to open or boost the server to bypass this.")
             elif lower == "w.balance":
                 await message.channel.send(f"""**Your Balance:** {bal[str(message.author)]} <:blobpoint:57793278033476611>""")
             elif lower == "w.bal":
@@ -120,7 +121,7 @@ async def on_message(message):
                     await message.channel.send(f"""{say[1]}""")
                     await message.delete()
                 else:
-                    await message.channel.send("You do not have the required permissions to use this command.")
+                    await message.channel.send("<:bfyNo:613851611600781342> You do not have the required permissions to use this command.")
             elif "w.add" == split[0]:
                 admin = guild.get_role(471024426356310028)
                 if admin in message.author.roles:
@@ -129,11 +130,11 @@ async def on_message(message):
                     if user not in bal.keys():
                         bal[user] = 0
                     bal[user] += int(say[2])
-                    await message.channel.send(f"""**{say[2]}bp** has/have been added to {user}'s balance""")
+                    await message.channel.send(f"""<:bfyYes:613851579266760733> **{say[2]}bp** has/have been added to {user}'s balance""")
                     channel = client.get_channel(471878672677208084)
                     await channel.send(f"""**Bank Update:** Bal of {user} now {bal[user]}""")
                 else:
-                    await message.channel.send("You do not have the required permissions to use this command.")
+                    await message.channel.send("<:bfyNo:613851611600781342> You do not have the required permissions to use this command.")
             elif "w.remove" == split[0]:
                 admin = guild.get_role(471024426356310028)
                 if admin in message.author.roles:
@@ -142,30 +143,30 @@ async def on_message(message):
                     if user not in bal.keys():
                         bal[user] = 0
                     bal[user] -= int(say[2])
-                    await message.channel.send(f"""**{say[2]}bp** has/have been removed from {user}'s balance""")
+                    await message.channel.send(f"""<:bfyYes:613851579266760733> **{say[2]}bp** has/have been removed from {user}'s balance""")
                     channel = client.get_channel(471878672677208084)
                     await channel.send(f"""**Bank Update:** Bal of {user} now {bal[user]}""")
                 else:
-                    await message.channel.send("You do not have the required permissions to use this command.")
+                    await message.channel.send("<:bfyNo:613851611600781342> You do not have the required permissions to use this command.")
             elif "w.slots" == split[0]:
                 admin = guild.get_role(471024426356310028)
                 if admin in message.author.roles:
                     if "set" == split[1]:
                         slots["max"] = int(split[2])
-                        await message.channel.send(f"""Max slots now **{split[2]}**.""")
+                        await message.channel.send(f"""<:bfyYes:613851579266760733> Max slots now **{split[2]}**.""")
                     elif "check" == split[1]:
                         await message.channel.send(f"""There are **{slots["used"]} out of {slots["max"]} slots used.**""")
                     elif "forceremove" == split[1]:
                         if slots["used"] > 0:
                             slots["used"] -= 1
-                            await message.channel.send(f"""Used slots reduced by 1, now {slots["used"]}.""")
+                            await message.channel.send(f"""<:bfyYes:613851579266760733> Used slots reduced by 1, now {slots["used"]}.""")
                         else:
-                            await message.channel.send("There are no requests in the queue.")
+                            await message.channel.send("<:bfyNo:613851611600781342> There are no requests in the queue or there are no slots used.")
                     elif "forceadd" == split[1]:
                         slots["used"] += 1
-                        await message.channel.send(f"""Forcefully used a slot. Used slots now {slots["used"]}.""")
+                        await message.channel.send(f"""<:bfyYes:613851579266760733> Forcefully used a slot. Used slots now {slots["used"]}.""")
                 else:
-                    await message.channel.send("You do not have the required permissions to use this command.")
+                    await message.channel.send("<:bfyNo:613851611600781342> You do not have the required permissions to use this command.")
             elif lower == "w.emojiupdate":
                 admin = guild.get_role(471024426356310028)
                 if admin in message.author.roles:
@@ -175,22 +176,34 @@ async def on_message(message):
                     for emoji in guild.emojis:
                         await channel.send(f"""{emoji} ~ `{emoji.name}`""")
                 else:
-                    await message.channel.send("You do not have the required permissions to use this command.")
+                    await message.channel.send("<:bfyNo:613851611600781342> You do not have the required permissions to use this command.")
             elif "w.request" == split[0]:
                 if "delete" == split[1]:
                     if status[str(message.author)] > 0:
                         await message.channel.send("Are you sure you would like to delete your request? Your <:blobpoint:577932728033476611> will be refunded. Please `confirm` or `cancel`.")
                         typ[message.author.id] = 5
                     else:
-                        message.channel.send("You currently have no active requests to delete.")
+                        await message.channel.send("<:bfyNo:613851611600781342> You currently have no active requests to delete.")
                 elif "claim" == split[1]:
                     print()
                 elif "submit" == split[1]:
                     print()
                 elif "check" == split[1]:
                     stat = status[str(message.author)]
-                    if stat == 1:
-                        await message.channel.send("You have a request in the queue. This command will have more functionality soon.")
+                    if stat > 0:
+                        embed = discord.Embed(title=f"""Your Request""", color=0x0080c0)
+                        embed.add_field(name="Blob Type", value=rqtype[str(message.author)])
+                        embed.add_field(name="Blob Description", value=rqdesc[str(message.author)])
+                        embed.add_field(name="Server Blob?", value=rqserv[str(message.author)])
+                        embed.set_thumbnail(
+                            url="https://cdn.discordapp.com/attachments/470304317748805652/581650589423763463/wiz.png")
+                        embed.set_footer(text=f"""Created by Tri#4823 ~ W1Z4RD {version}""")
+                        if stat == 1:
+                            await message.channel.send(content="Your request is **unclaimed**. You can edit it with the `edit` subommand.", embed=embed)
+                        elif stat == 2:
+                            await message.channel.send(content="Your request was claimed by artist [ARTIST]. The request is no longer able to be edited")
+                    else:
+                        await message.channel.send("<:bfyNo:613851611600781342> You do not have a request in the queue. Use the `w.request` command to create one.")
                 elif "forcedelete" == split[1]:
                     admin = guild.get_role(471024426356310028)
                     if admin in message.author.roles:
@@ -198,11 +211,11 @@ async def on_message(message):
                         if status[str(user)] > 0:
                             status[str(user)] = 0
                             slots["used"] -= 1
-                            await message.channel.send(f"""You have forcefully deleted {str(user)}'s request. You may proceed to delete the message in the queue.""")
+                            await message.channel.send(f"""<:bfyYes:613851579266760733> You have forcefully deleted {str(user)}'s request. You may proceed to delete the message in the queue.""")
                         else:
-                            await message.channel.send("That user has no request in the queue.")
+                            await message.channel.send("<:bfyNo:613851611600781342> That user has no request in the queue.")
                     else:
-                        await message.channel.send("You do not have the required permissions to use this subcommand.")
+                        await message.channel.send("<:bfyNo:613851611600781342> You do not have the required permissions to use this subcommand.")
         elif typ[message.author.id] == 1:
             if "1" in message.content:
                 await message.channel.send("__Great Choice! Now, please state what you would like your blob(s) to look like, or say `cancel`.__")
@@ -237,7 +250,7 @@ async def on_message(message):
                 rqtype[str(message.author)] = "Custom Emoji Pack"
                 typ[message.author.id] += 1
             else:
-                await message.channel.send("That was not a valid response. Send a number from 1 through 8.")
+                await message.channel.send("<:bfyNo:613851611600781342> That was not a valid response. Send a number from 1 through 8.")
         elif typ[message.author.id] == 2:
             await message.channel.send("__Great! One last thing. Would you like this to be a server blob?__")
             await message.channel.send("Server blobs represent you in the server, and are made into emojis that you can use with Nitro.")
@@ -258,10 +271,10 @@ async def on_message(message):
             typ[message.author.id] += 1
         elif typ[message.author.id] == 4:
             if lower == "confirm":
-                await message.channel.send("The blob request has been added to the queue.")
+                await message.channel.send("<:bfyYes:613851579266760733> The blob request has been added to the queue!")
                 await message.channel.send("You will receive notifications as your blob is being made.")
                 await message.channel.send("Send any image references to <@266319920009183242>.")
-                embed = discord.Embed(title=f"""{message.author}""")
+                embed = discord.Embed(title=f"""{message.author}""", color=0x0080c0)
                 embed.add_field(name="Blob Type", value=rqtype[str(message.author)])
                 embed.add_field(name="Blob Description", value=rqdesc[str(message.author)])
                 embed.add_field(name="Server Blob?", value=rqserv[str(message.author)])
@@ -273,16 +286,16 @@ async def on_message(message):
                 status[str(message.author)] = 1
                 slots["used"] += 1
             else:
-                await message.channel.send("That was not a valid response. Please `confirm` or `cancel`.")
+                await message.channel.send("<:bfyNo:613851611600781342> That was not a valid response. Please `confirm` or `cancel`.")
         elif typ[message.author.id] == 5:
             if lower == "confirm":
-                await message.channel.send("<@266319920009183242> will proceed to delete your request and refund your <:blobpoint:577932728033476611>. At this point you may also start a new request.")
-                status[message.author.id] = 0
+                await message.channel.send("<:bfyYes:613851579266760733> <@266319920009183242> will proceed to delete your request and refund your <:blobpoint:577932728033476611>. At this point you may also start a new request.")
+                status[str(message.author)] = 0
                 slots["used"] -= 1
                 channel = client.get_channel(471878672677208084)
                 await channel.send(f"""{str(message.author)} has deleted their request.""")
             else:
-                await message.channel.send("That was not a valid response. Please `confirm` or `cancel`.")
+                await message.channel.send("<:bfyNo:613851611600781342> That was not a valid response. Please `confirm` or `cancel`.")
 
     dicts = [bal, status, rqtype, rqdesc, rqserv, mess, slots]
     for d in dicts:
@@ -294,8 +307,6 @@ async def on_guild_emojis_update(guild0, before, after):
     channel = 0
     if guild0.id == 469591475999604746:
         channel = client.get_channel(570397486141669406)
-    elif guild0.id == 591038750273044501:
-        channel = client.get_channel(591040530331336789)  # FLAG
     emoadd, emoaddname, emoremove, emoremovename, lis, lis2 = "", "", "", "", [], []
     for emoji in before:
         for emoji2 in after:
