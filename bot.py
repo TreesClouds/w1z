@@ -211,6 +211,20 @@ async def on_message(message):
                         if status[str(user)] > 0:
                             status[str(user)] = 0
                             slots["used"] -= 1
+                            if rqtype[user] == "Animated Blob":
+                                bal[user] += 6
+                            elif rqtype[user] == "Bongo Cat":
+                                bal[user] += 7
+                            elif rqtype[user] == "Peep":
+                                bal[user] += 3
+                            elif rqtype[user] == "Animated Peep":
+                                bal[user] += 8
+                            elif rqtype[user] == "Full Blob Pack":
+                                bal[user] += 20
+                            elif rqtype[user] == "Custom Emoji":
+                                bal[user] += 10
+                            elif rqtype[user] == "Custom Emoji Pack":
+                                bal[user] += 40
                             await message.channel.send(f"""<:bfyYes:613851579266760733> You have forcefully deleted {str(user)}'s request. You may proceed to delete the message in the queue.""")
                         else:
                             await message.channel.send("<:bfyNo:613851611600781342> That user has no request in the queue.")
@@ -222,33 +236,54 @@ async def on_message(message):
                 rqtype[str(message.author)] = "Normal Blob"
                 typ[message.author.id] += 1
             elif "2" in message.content:
-                await message.channel.send("__Great Choice! Now, please state what you would like your blob(s) to look like, or say `cancel`.__")
-                rqtype[str(message.author)] = "Animated Blob"
-                typ[message.author.id] += 1
+                if bal[str(message.author)] >= 6:
+                    await message.channel.send("__Great Choice! Now, please state what you would like your blob(s) to look like, or say `cancel`.__")
+                    rqtype[str(message.author)] = "Animated Blob"
+                    typ[message.author.id] += 1
+                else:
+                    await message.channel.send("<:bfyNo:613851611600781342> You do not have enough <:blobpoint:577932728033476611> to request this item. Pick a different item or `cancel`.")
             elif "3" in message.content:
-                await message.channel.send("__Great Choice! Now, please state what you would like your blob(s) to look like, or say `cancel`.__")
-                rqtype[str(message.author)] = "Bongo Cat"
-                typ[message.author.id] += 1
+                if bal[str(message.author)] >= 7:
+                    await message.channel.send("__Great Choice! Now, please state what you would like your blob(s) to look like, or say `cancel`.__")
+                    rqtype[str(message.author)] = "Bongo Cat"
+                    typ[message.author.id] += 1
+                else:
+                    await message.channel.send("<:bfyNo:613851611600781342> You do not have enough <:blobpoint:577932728033476611> to request this item. Pick a different item or `cancel`.")
             elif "4" in message.content:
-                await message.channel.send("__Great Choice! Now, please state what you would like your blob(s) to look like, or say `cancel`.__")
-                rqtype[str(message.author)] = "Peep"
-                typ[message.author.id] += 1
+                if bal[str(message.author)] >= 3:
+                    await message.channel.send("__Great Choice! Now, please state what you would like your blob(s) to look like, or say `cancel`.__")
+                    rqtype[str(message.author)] = "Peep"
+                    typ[message.author.id] += 1
+                else:
+                    await message.channel.send("<:bfyNo:613851611600781342> You do not have enough <:blobpoint:577932728033476611> to request this item. Pick a different item or `cancel`.")
             elif "5" in message.content:
-                await message.channel.send("__Great Choice! Now, please state what you would like your blob(s) to look like, or say `cancel`.__")
-                rqtype[str(message.author)] = "Animated Peep"
-                typ[message.author.id] += 1
+                if bal[str(message.author)] >= 8:
+                    await message.channel.send("__Great Choice! Now, please state what you would like your blob(s) to look like, or say `cancel`.__")
+                    rqtype[str(message.author)] = "Animated Peep"
+                    typ[message.author.id] += 1
+                else:
+                    await message.channel.send("<:bfyNo:613851611600781342> You do not have enough <:blobpoint:577932728033476611> to request this item. Pick a different item or `cancel`.")
             elif "6" in message.content:
-                await message.channel.send("__Great Choice! Now, please state what you would like your blob(s) to look like, or say `cancel`.__")
-                rqtype[str(message.author)] = "Full Blob Pack"
-                typ[message.author.id] += 1
+                if bal[str(message.author)] >= 20:
+                    await message.channel.send("__Great Choice! Now, please state what you would like your blob(s) to look like, or say `cancel`.__")
+                    rqtype[str(message.author)] = "Full Blob Pack"
+                    typ[message.author.id] += 1
+                else:
+                    await message.channel.send("<:bfyNo:613851611600781342> You do not have enough <:blobpoint:577932728033476611> to request this item. Pick a different item or `cancel`.")
             elif "7" in message.content:
-                await message.channel.send("__Great Choice! Now, please state what you would like your blob(s) to look like, or say `cancel`.__")
-                rqtype[str(message.author)] = "Custom Emoji"
-                typ[message.author.id] += 1
+                if bal[str(message.author)] >= 10:
+                    await message.channel.send("__Great Choice! Now, please state what you would like your blob(s) to look like, or say `cancel`.__")
+                    rqtype[str(message.author)] = "Custom Emoji"
+                    typ[message.author.id] += 1
+                else:
+                    await message.channel.send("<:bfyNo:613851611600781342> You do not have enough <:blobpoint:577932728033476611> to request this item. Pick a different item or `cancel`.")
             elif "8" in message.content:
-                await message.channel.send("__Great Choice! Now, please state what you would like your blob(s) to look like, or say `cancel`.__")
-                rqtype[str(message.author)] = "Custom Emoji Pack"
-                typ[message.author.id] += 1
+                if bal[str(message.author)] >= 40:
+                    await message.channel.send("__Great Choice! Now, please state what you would like your blob(s) to look like, or say `cancel`.__")
+                    rqtype[str(message.author)] = "Custom Emoji Pack"
+                    typ[message.author.id] += 1
+                else:
+                    await message.channel.send("<:bfyNo:613851611600781342> You do not have enough <:blobpoint:577932728033476611> to request this item. Pick a different item or `cancel`.")
             else:
                 await message.channel.send("<:bfyNo:613851611600781342> That was not a valid response. Send a number from 1 through 8.")
         elif typ[message.author.id] == 2:
@@ -285,13 +320,42 @@ async def on_message(message):
                 typ[message.author.id] = 0
                 status[str(message.author)] = 1
                 slots["used"] += 1
+                if rqtype[str(message.author)] == "Animated Blob":
+                    bal[str(message.author)] -= 6
+                elif rqtype[str(message.author)] == "Bongo Cat":
+                    bal[str(message.author)] -= 7
+                elif rqtype[str(message.author)] == "Peep":
+                    bal[str(message.author)] -= 3
+                elif rqtype[str(message.author)] == "Animated Peep":
+                    bal[str(message.author)] -= 8
+                elif rqtype[str(message.author)] == "Full Blob Pack":
+                    bal[str(message.author)] -= 20
+                elif rqtype[str(message.author)] == "Custom Emoji":
+                    bal[str(message.author)] -= 10
+                elif rqtype[str(message.author)] == "Custom Emoji Pack":
+                    bal[str(message.author)] -= 40
             else:
                 await message.channel.send("<:bfyNo:613851611600781342> That was not a valid response. Please `confirm` or `cancel`.")
         elif typ[message.author.id] == 5:
             if lower == "confirm":
                 await message.channel.send("<:bfyYes:613851579266760733> <@266319920009183242> will proceed to delete your request and refund your <:blobpoint:577932728033476611>. At this point you may also start a new request.")
                 status[str(message.author)] = 0
+                typ[message.author.id] = 0
                 slots["used"] -= 1
+                if rqtype[str(message.author)] == "Animated Blob":
+                    bal[str(message.author)] += 6
+                elif rqtype[str(message.author)] == "Bongo Cat":
+                    bal[str(message.author)] += 7
+                elif rqtype[str(message.author)] == "Peep":
+                    bal[str(message.author)] += 3
+                elif rqtype[str(message.author)] == "Animated Peep":
+                    bal[str(message.author)] += 8
+                elif rqtype[str(message.author)] == "Full Blob Pack":
+                    bal[str(message.author)] += 20
+                elif rqtype[str(message.author)] == "Custom Emoji":
+                    bal[str(message.author)] += 10
+                elif rqtype[str(message.author)] == "Custom Emoji Pack":
+                    bal[str(message.author)] += 40
                 channel = client.get_channel(471878672677208084)
                 await channel.send(f"""{str(message.author)} has deleted their request.""")
             else:
