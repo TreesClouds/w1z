@@ -16,7 +16,7 @@ mess = db.doc.find_one({'_id': ObjectId('5d5779523f5cc0f1bdd8511f')})
 slots = db.doc.find_one({'_id': ObjectId('5d5b51f233ba3bc7166344e3')})
 
 typ = {}
-version = "v1.2.3"
+version = "v1.2.4"
 
 
 @client.event
@@ -54,29 +54,32 @@ async def on_message(message):
     split = lower.split(" ")
     if message.author.id not in typ.keys():
         typ[message.author.id] = 0
-    if str(message.author) not in status.keys():
-        status[str(message.author)] = 0
-    if str(message.author) not in bal.keys():
-        bal[str(message.author)] = 0
+    if str(message.author.id) not in status.keys():
+        status[str(message.author.id)] = 0
+    if str(message.author.id) not in bal.keys():
+        bal[str(message.author.id)] = 0
     if message.author.guild != guild:
-        typ[message.author.id] = 0
+        typ[message.author.id] = -1
+    if typ[message.author.id] == -1:
+        if message.author.guild == guild:
+            typ[message.author.id] = 0
     if lower == "cancel":
         if typ[message.author.id] > 0:
             await message.channel.send("<:bfyNo:613851611600781342> **The requested action has been canceled.**")
             typ[message.author.id] = 0
-            rqtype[str(message.author)], rqdesc[str(message.author)], rqserv[str(message.author)] = "", "", ""
+            rqtype[str(message.author.id)], rqdesc[str(message.author.id)], rqserv[str(message.author.id)] = "", "", ""
     elif message.author.id == 292953664492929025:
         if "w.exc" in message.content:
             mem = message.content.split(" ")
             user = str(client.get_user(int(mem[1])))
             if user not in bal.keys():
                 bal[user] = 0
-            await message.channel.send("<:bfyYes:613851579266760733> 2 BLOB POINTS have been added to your account.")
+            await message.channel.send("<:bfyYes:613851579266760733> 2 <:blobpoint:577932728033476611> have been added to your account.")
             bal[user] += 2
             channel = client.get_channel(471878672677208084)
             await channel.send(f"""**Bank Update:** Bal of {user} now {bal[user]}""")
     else:
-        if typ[message.author.id] == 0:
+        if typ[message.author.id] <= 0:
             if lower == "w.help":
                 embed = discord.Embed(title="Blob Bot Help", description="The full list of W1Z4RD's commands", color=0x0080c0)
                 embed.add_field(name="w.request", value="Request a blob")
@@ -87,19 +90,20 @@ async def on_message(message):
                 embed.set_footer(text=f"""Created by Tri#4823 ~ W1Z4RD {version}""")
                 await message.channel.send(content=None, embed=embed)
             elif lower == "w.exchange":
-                mem = str(message.author)
+                mem = str(message.author.id)
+                truemem = str(message.author)
                 if mem not in bal.keys():
                     bal[mem] = 0
                 if bal[mem] > 1:
                     await message.channel.send("<:bfyYes:613851579266760733> <@266319920009183242> will complete the transaction within 24 hours.")
                     bal[mem] -= 2
                     channel = client.get_channel(471878672677208084)
-                    await channel.send(f"""**Bank Update:** Bal of {mem} now {bal[mem]}""")
+                    await channel.send(f"""**Bank Update:** Bal of {truemem} now {bal[mem]}""")
                 else:
-                    await message.channel.send("<:bfyNo:613851611600781342> You do not have enough BLOB POINTS to do so.")
+                    await message.channel.send("<:bfyNo:613851611600781342> You do not have enough <:blobpoint:577932728033476611> to do so.")
             elif lower == "w.request":
                 if slots["used"] < slots["max"] or guild.get_role(600678332320710666) in message.author.roles:
-                    if status[str(message.author)] == 0:
+                    if status[str(message.author.id)] == 0:
                         embed = discord.Embed(title="W1Z Request Command", description="A full list of all blob types!", color=0x0080c0)
                         embed.set_image(url="https://cdn.discordapp.com/attachments/470304317748805652/586383366538919965/d6783672-991f-4235-b3a6-b48b4d63eb5d.png")
                         embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/470304317748805652/581650589423763463/wiz.png")
@@ -111,9 +115,9 @@ async def on_message(message):
                 else:
                     await message.channel.send("<:bfyNo:613851611600781342> The maximum amount of request slots has been reached. Either wait for a slot to open or boost the server to bypass this.")
             elif lower == "w.balance":
-                await message.channel.send(f"""**Your Balance:** {bal[str(message.author)]} <:blobpoint:57793278033476611>""")
+                await message.channel.send(f"""**Your Balance:** {bal[str(message.author.id)]} <:blobpoint:577932728033476611>""")
             elif lower == "w.bal":
-                await message.channel.send(f"""**Your Balance:** {bal[str(message.author)]} <:blobpoint:57793278033476611>""")
+                await message.channel.send(f"""**Your Balance:** {bal[str(message.author.id)]} <:blobpoint:577932728033476611>""")
             elif "w.say" == split[0]:
                 admin = guild.get_role(471024426356310028)
                 if admin in message.author.roles:
@@ -126,26 +130,26 @@ async def on_message(message):
                 admin = guild.get_role(471024426356310028)
                 if admin in message.author.roles:
                     say = message.content.split(" ", 2)
-                    user = str(client.get_user(int(say[1])))
-                    if user not in bal.keys():
-                        bal[user] = 0
-                    bal[user] += int(say[2])
-                    await message.channel.send(f"""<:bfyYes:613851579266760733> **{say[2]}bp** has/have been added to {user}'s balance""")
+                    user = client.get_user(int(say[1]))
+                    if str(user.id) not in bal.keys():
+                        bal[str(user.id)] = 0
+                    bal[str(user.id)] += int(say[2])
+                    await message.channel.send(f"""<:bfyYes:613851579266760733> **{say[2]}bp** has/have been added to {str(user)}'s balance""")
                     channel = client.get_channel(471878672677208084)
-                    await channel.send(f"""**Bank Update:** Bal of {user} now {bal[user]}""")
+                    await channel.send(f"""**Bank Update:** Bal of {str(user)} now {bal[str(user.id)]}""")
                 else:
                     await message.channel.send("<:bfyNo:613851611600781342> You do not have the required permissions to use this command.")
             elif "w.remove" == split[0]:
                 admin = guild.get_role(471024426356310028)
                 if admin in message.author.roles:
                     say = message.content.split(" ", 2)
-                    user = str(client.get_user(int(say[1])))
-                    if user not in bal.keys():
-                        bal[user] = 0
-                    bal[user] -= int(say[2])
-                    await message.channel.send(f"""<:bfyYes:613851579266760733> **{say[2]}bp** has/have been removed from {user}'s balance""")
+                    user = client.get_user(int(say[1]))
+                    if str(user.id) not in bal.keys():
+                        bal[str(user.id)] = 0
+                    bal[str(user.id)] -= int(say[2])
+                    await message.channel.send(f"""<:bfyYes:613851579266760733> **{say[2]}bp** has/have been removed from {str(user)}'s balance""")
                     channel = client.get_channel(471878672677208084)
-                    await channel.send(f"""**Bank Update:** Bal of {user} now {bal[user]}""")
+                    await channel.send(f"""**Bank Update:** Bal of {str(user)} now {bal[str(user.id)]}""")
                 else:
                     await message.channel.send("<:bfyNo:613851611600781342> You do not have the required permissions to use this command.")
             elif "w.slots" == split[0]:
@@ -179,7 +183,7 @@ async def on_message(message):
                     await message.channel.send("<:bfyNo:613851611600781342> You do not have the required permissions to use this command.")
             elif "w.request" == split[0]:
                 if "delete" == split[1]:
-                    if status[str(message.author)] > 0:
+                    if status[str(message.author.id)] > 0:
                         await message.channel.send("Are you sure you would like to delete your request? Your <:blobpoint:577932728033476611> will be refunded. Please `confirm` or `cancel`.")
                         typ[message.author.id] = 5
                     else:
@@ -189,12 +193,12 @@ async def on_message(message):
                 elif "submit" == split[1]:
                     print()
                 elif "check" == split[1]:
-                    stat = status[str(message.author)]
+                    stat = status[str(message.author.id)]
                     if stat > 0:
                         embed = discord.Embed(title=f"""Your Request""", color=0x0080c0)
-                        embed.add_field(name="Blob Type", value=rqtype[str(message.author)])
-                        embed.add_field(name="Blob Description", value=rqdesc[str(message.author)])
-                        embed.add_field(name="Server Blob?", value=rqserv[str(message.author)])
+                        embed.add_field(name="Blob Type", value=rqtype[str(message.author.id)])
+                        embed.add_field(name="Blob Description", value=rqdesc[str(message.author.id)])
+                        embed.add_field(name="Server Blob?", value=rqserv[str(message.author.id)])
                         embed.set_thumbnail(
                             url="https://cdn.discordapp.com/attachments/470304317748805652/581650589423763463/wiz.png")
                         embed.set_footer(text=f"""Created by Tri#4823 ~ W1Z4RD {version}""")
@@ -208,23 +212,25 @@ async def on_message(message):
                     admin = guild.get_role(471024426356310028)
                     if admin in message.author.roles:
                         user = client.get_user(int(split[2]))
-                        if status[str(user)] > 0:
-                            status[str(user)] = 0
+                        if status[str(user.id)] > 0:
+                            status[str(user.id)] = 0
                             slots["used"] -= 1
-                            if rqtype[user] == "Animated Blob":
-                                bal[user] += 6
-                            elif rqtype[user] == "Bongo Cat":
-                                bal[user] += 7
-                            elif rqtype[user] == "Peep":
-                                bal[user] += 3
-                            elif rqtype[user] == "Animated Peep":
-                                bal[user] += 8
-                            elif rqtype[user] == "Full Blob Pack":
-                                bal[user] += 20
-                            elif rqtype[user] == "Custom Emoji":
-                                bal[user] += 10
-                            elif rqtype[user] == "Custom Emoji Pack":
-                                bal[user] += 40
+                            if rqtype[str(user.id)] == "Animated Blob":
+                                bal[str(user.id)] += 6
+                            if rqtype[str(user.id)] == "Normal Blob":
+                                bal[str(user.id)] += 1
+                            elif rqtype[str(user.id)] == "Bongo Cat":
+                                bal[str(user.id)] += 7
+                            elif rqtype[str(user.id)] == "Peep":
+                                bal[str(user.id)] += 3
+                            elif rqtype[str(user.id)] == "Animated Peep":
+                                bal[str(user.id)] += 8
+                            elif rqtype[str(user.id)] == "Full Blob Pack":
+                                bal[str(user.id)] += 40
+                            elif rqtype[str(user.id)] == "Custom Emoji":
+                                bal[str(user.id)] += 10
+                            elif rqtype[str(user.id)] == "Custom Emoji Pack":
+                                bal[str(user.id)] += 80
                             await message.channel.send(f"""<:bfyYes:613851579266760733> You have forcefully deleted {str(user)}'s request. You may proceed to delete the message in the queue.""")
                         else:
                             await message.channel.send("<:bfyNo:613851611600781342> That user has no request in the queue.")
@@ -232,55 +238,58 @@ async def on_message(message):
                         await message.channel.send("<:bfyNo:613851611600781342> You do not have the required permissions to use this subcommand.")
         elif typ[message.author.id] == 1:
             if "1" in message.content:
-                await message.channel.send("__Great Choice! Now, please state what you would like your blob(s) to look like, or say `cancel`.__")
-                rqtype[str(message.author)] = "Normal Blob"
-                typ[message.author.id] += 1
-            elif "2" in message.content:
-                if bal[str(message.author)] >= 6:
+                if bal[str(message.author.id)] >= 1:
                     await message.channel.send("__Great Choice! Now, please state what you would like your blob(s) to look like, or say `cancel`.__")
-                    rqtype[str(message.author)] = "Animated Blob"
+                    rqtype[str(message.author.id)] = "Normal Blob"
+                    typ[message.author.id] += 1
+                else:
+                    await message.channel.send("<:bfyNo:613851611600781342> You do not have enough <:blobpoint:577932728033476611> to request this item. Pick a different item or `cancel`.")
+            elif "2" in message.content:
+                if bal[str(message.author.id)] >= 6:
+                    await message.channel.send("__Great Choice! Now, please state what you would like your blob(s) to look like, or say `cancel`.__")
+                    rqtype[str(message.author.id)] = "Animated Blob"
                     typ[message.author.id] += 1
                 else:
                     await message.channel.send("<:bfyNo:613851611600781342> You do not have enough <:blobpoint:577932728033476611> to request this item. Pick a different item or `cancel`.")
             elif "3" in message.content:
-                if bal[str(message.author)] >= 7:
+                if bal[str(message.author.id)] >= 7:
                     await message.channel.send("__Great Choice! Now, please state what you would like your blob(s) to look like, or say `cancel`.__")
-                    rqtype[str(message.author)] = "Bongo Cat"
+                    rqtype[str(message.author.id)] = "Bongo Cat"
                     typ[message.author.id] += 1
                 else:
                     await message.channel.send("<:bfyNo:613851611600781342> You do not have enough <:blobpoint:577932728033476611> to request this item. Pick a different item or `cancel`.")
             elif "4" in message.content:
-                if bal[str(message.author)] >= 3:
+                if bal[str(message.author.id)] >= 3:
                     await message.channel.send("__Great Choice! Now, please state what you would like your blob(s) to look like, or say `cancel`.__")
-                    rqtype[str(message.author)] = "Peep"
+                    rqtype[str(message.author.id)] = "Peep"
                     typ[message.author.id] += 1
                 else:
                     await message.channel.send("<:bfyNo:613851611600781342> You do not have enough <:blobpoint:577932728033476611> to request this item. Pick a different item or `cancel`.")
             elif "5" in message.content:
-                if bal[str(message.author)] >= 8:
+                if bal[str(message.author.id)] >= 8:
                     await message.channel.send("__Great Choice! Now, please state what you would like your blob(s) to look like, or say `cancel`.__")
-                    rqtype[str(message.author)] = "Animated Peep"
+                    rqtype[str(message.author.id)] = "Animated Peep"
                     typ[message.author.id] += 1
                 else:
                     await message.channel.send("<:bfyNo:613851611600781342> You do not have enough <:blobpoint:577932728033476611> to request this item. Pick a different item or `cancel`.")
             elif "6" in message.content:
-                if bal[str(message.author)] >= 20:
+                if bal[str(message.author.id)] >= 40:
                     await message.channel.send("__Great Choice! Now, please state what you would like your blob(s) to look like, or say `cancel`.__")
-                    rqtype[str(message.author)] = "Full Blob Pack"
+                    rqtype[str(message.author.id)] = "Full Blob Pack"
                     typ[message.author.id] += 1
                 else:
                     await message.channel.send("<:bfyNo:613851611600781342> You do not have enough <:blobpoint:577932728033476611> to request this item. Pick a different item or `cancel`.")
             elif "7" in message.content:
-                if bal[str(message.author)] >= 10:
+                if bal[str(message.author.id)] >= 10:
                     await message.channel.send("__Great Choice! Now, please state what you would like your blob(s) to look like, or say `cancel`.__")
-                    rqtype[str(message.author)] = "Custom Emoji"
+                    rqtype[str(message.author.id)] = "Custom Emoji"
                     typ[message.author.id] += 1
                 else:
                     await message.channel.send("<:bfyNo:613851611600781342> You do not have enough <:blobpoint:577932728033476611> to request this item. Pick a different item or `cancel`.")
             elif "8" in message.content:
-                if bal[str(message.author)] >= 40:
+                if bal[str(message.author.id)] >= 80:
                     await message.channel.send("__Great Choice! Now, please state what you would like your blob(s) to look like, or say `cancel`.__")
-                    rqtype[str(message.author)] = "Custom Emoji Pack"
+                    rqtype[str(message.author.id)] = "Custom Emoji Pack"
                     typ[message.author.id] += 1
                 else:
                     await message.channel.send("<:bfyNo:613851611600781342> You do not have enough <:blobpoint:577932728033476611> to request this item. Pick a different item or `cancel`.")
@@ -290,19 +299,19 @@ async def on_message(message):
             await message.channel.send("__Great! One last thing. Would you like this to be a server blob?__")
             await message.channel.send("Server blobs represent you in the server, and are made into emojis that you can use with Nitro.")
             await message.channel.send("However, only NORMAL BLOB requests can qualify. So what do you say, or `cancel`.")
-            rqdesc[str(message.author)] = message.content
+            rqdesc[str(message.author.id)] = message.content
             typ[message.author.id] += 1
         elif typ[message.author.id] == 3:
             await message.channel.send("Cool! Now please confirm the following details before making your purchase.")
-            await message.channel.send("The appropriate amount of BLOB POINTS will be deducted from your account as listed in <#526232642425978892>.")
+            await message.channel.send("The appropriate amount of <:blobpoint:577932728033476611> will be deducted from your account as listed in <#526232642425978892>.")
             embed = discord.Embed(title="Confirm Information", description="Either `confirm` or `cancel`", color=0x0080c0)
-            embed.add_field(name="Blob Type", value=rqtype[str(message.author)])
-            embed.add_field(name="Blob Description", value=rqdesc[str(message.author)])
+            embed.add_field(name="Blob Type", value=rqtype[str(message.author.id)])
+            embed.add_field(name="Blob Description", value=rqdesc[str(message.author.id)])
             embed.add_field(name="Server Blob?", value=message.content)
             embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/470304317748805652/581650589423763463/wiz.png")
             embed.set_footer(text=f"""Created by Tri#4823 ~ W1Z4RD {version}""")
             await message.channel.send(embed=embed)
-            rqserv[str(message.author)] = message.content
+            rqserv[str(message.author.id)] = message.content
             typ[message.author.id] += 1
         elif typ[message.author.id] == 4:
             if lower == "confirm":
@@ -310,52 +319,56 @@ async def on_message(message):
                 await message.channel.send("You will receive notifications as your blob is being made.")
                 await message.channel.send("Send any image references to <@266319920009183242>.")
                 embed = discord.Embed(title=f"""{message.author}""", color=0x0080c0)
-                embed.add_field(name="Blob Type", value=rqtype[str(message.author)])
-                embed.add_field(name="Blob Description", value=rqdesc[str(message.author)])
-                embed.add_field(name="Server Blob?", value=rqserv[str(message.author)])
+                embed.add_field(name="Blob Type", value=rqtype[str(message.author.id)])
+                embed.add_field(name="Blob Description", value=rqdesc[str(message.author.id)])
+                embed.add_field(name="Server Blob?", value=rqserv[str(message.author.id)])
                 embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/470304317748805652/581650589423763463/wiz.png")
                 embed.set_footer(text=f"""Created by Tri#4823 ~ W1Z4RD {version}""")
                 channel = client.get_channel(611768294315130891)
                 await channel.send(content=f"""**Incoming Blob Request!** From {message.author.mention}""", embed=embed)
                 typ[message.author.id] = 0
-                status[str(message.author)] = 1
+                status[str(message.author.id)] = 1
                 slots["used"] += 1
-                if rqtype[str(message.author)] == "Animated Blob":
-                    bal[str(message.author)] -= 6
-                elif rqtype[str(message.author)] == "Bongo Cat":
-                    bal[str(message.author)] -= 7
-                elif rqtype[str(message.author)] == "Peep":
-                    bal[str(message.author)] -= 3
-                elif rqtype[str(message.author)] == "Animated Peep":
-                    bal[str(message.author)] -= 8
-                elif rqtype[str(message.author)] == "Full Blob Pack":
-                    bal[str(message.author)] -= 20
-                elif rqtype[str(message.author)] == "Custom Emoji":
-                    bal[str(message.author)] -= 10
-                elif rqtype[str(message.author)] == "Custom Emoji Pack":
-                    bal[str(message.author)] -= 40
+                if rqtype[str(message.author.id)] == "Animated Blob":
+                    bal[str(message.author.id)] -= 6
+                elif rqtype[str(message.author.id)] == "Normal Blob":
+                    bal[str(message.author.id)] -= 1
+                elif rqtype[str(message.author.id)] == "Bongo Cat":
+                    bal[str(message.author.id)] -= 7
+                elif rqtype[str(message.author.id)] == "Peep":
+                    bal[str(message.author.id)] -= 3
+                elif rqtype[str(message.author.id)] == "Animated Peep":
+                    bal[str(message.author.id)] -= 8
+                elif rqtype[str(message.author.id)] == "Full Blob Pack":
+                    bal[str(message.author.id)] -= 40
+                elif rqtype[str(message.author.id)] == "Custom Emoji":
+                    bal[str(message.author.id)] -= 10
+                elif rqtype[str(message.author.id)] == "Custom Emoji Pack":
+                    bal[str(message.author.id)] -= 80
             else:
                 await message.channel.send("<:bfyNo:613851611600781342> That was not a valid response. Please `confirm` or `cancel`.")
         elif typ[message.author.id] == 5:
             if lower == "confirm":
                 await message.channel.send("<:bfyYes:613851579266760733> <@266319920009183242> will proceed to delete your request and refund your <:blobpoint:577932728033476611>. At this point you may also start a new request.")
-                status[str(message.author)] = 0
+                status[str(message.author.id)] = 0
                 typ[message.author.id] = 0
                 slots["used"] -= 1
-                if rqtype[str(message.author)] == "Animated Blob":
-                    bal[str(message.author)] += 6
-                elif rqtype[str(message.author)] == "Bongo Cat":
-                    bal[str(message.author)] += 7
-                elif rqtype[str(message.author)] == "Peep":
-                    bal[str(message.author)] += 3
-                elif rqtype[str(message.author)] == "Animated Peep":
-                    bal[str(message.author)] += 8
-                elif rqtype[str(message.author)] == "Full Blob Pack":
-                    bal[str(message.author)] += 20
-                elif rqtype[str(message.author)] == "Custom Emoji":
-                    bal[str(message.author)] += 10
-                elif rqtype[str(message.author)] == "Custom Emoji Pack":
-                    bal[str(message.author)] += 40
+                if rqtype[str(message.author.id)] == "Animated Blob":
+                    bal[str(message.author.id)] += 6
+                elif rqtype[str(message.author.id)] == "Normal Blob":
+                    bal[str(message.author.id)] += 1
+                elif rqtype[str(message.author.id)] == "Bongo Cat":
+                    bal[str(message.author.id)] += 7
+                elif rqtype[str(message.author.id)] == "Peep":
+                    bal[str(message.author.id)] += 3
+                elif rqtype[str(message.author.id)] == "Animated Peep":
+                    bal[str(message.author.id)] += 8
+                elif rqtype[str(message.author.id)] == "Full Blob Pack":
+                    bal[str(message.author.id)] += 40
+                elif rqtype[str(message.author.id)] == "Custom Emoji":
+                    bal[str(message.author.id)] += 10
+                elif rqtype[str(message.author.id)] == "Custom Emoji Pack":
+                    bal[str(message.author.id)] += 80
                 channel = client.get_channel(471878672677208084)
                 await channel.send(f"""{str(message.author)} has deleted their request.""")
             else:
