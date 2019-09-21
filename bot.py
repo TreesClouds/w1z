@@ -16,7 +16,7 @@ mess = db.doc.find_one({'_id': ObjectId('5d5779523f5cc0f1bdd8511f')})
 slots = db.doc.find_one({'_id': ObjectId('5d5b51f233ba3bc7166344e3')})
 
 typ = {}
-version = "v1.2.4"
+version = "v1.2.5"
 
 
 @client.event
@@ -105,7 +105,7 @@ async def on_message(message):
                 if slots["used"] < slots["max"] or guild.get_role(600678332320710666) in message.author.roles:
                     if status[str(message.author.id)] == 0:
                         embed = discord.Embed(title="W1Z Request Command", description="A full list of all blob types!", color=0x0080c0)
-                        embed.set_image(url="https://cdn.discordapp.com/attachments/470304317748805652/586383366538919965/d6783672-991f-4235-b3a6-b48b4d63eb5d.png")
+                        embed.set_image(url="https://cdn.discordapp.com/attachments/470304317748805652/624941100418859018/5309c984-4d97-40c1-bbeb-24f5045d5ddf.png")
                         embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/470304317748805652/581650589423763463/wiz.png")
                         embed.set_footer(text=f"""Created by Tri#4823 ~ W1Z4RD {version}""")
                         await message.channel.send(content="__Please respond with the respective number, or `cancel`__", embed=embed)
