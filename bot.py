@@ -71,7 +71,7 @@ async def on_message(message):
     elif message.author.id == 292953664492929025:
         if "w.exc" in message.content:
             mem = message.content.split(" ")
-            user = str(client.get_user(int(mem[1])))
+            user = mem[1]
             if user not in bal.keys():
                 bal[user] = 0
             await message.channel.send("<:bfyYes:613851579266760733> 2 <:blobpoint:577932728033476611> have been added to your account.")
