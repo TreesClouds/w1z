@@ -16,7 +16,7 @@ mess = db.doc.find_one({'_id': ObjectId('5d5779523f5cc0f1bdd8511f')})
 slots = db.doc.find_one({'_id': ObjectId('5d5b51f233ba3bc7166344e3')})
 
 typ = {}
-version = "v1.2.5"
+version = "v1.2.4b"
 
 
 @client.event
