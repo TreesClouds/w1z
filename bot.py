@@ -16,7 +16,7 @@ mess = db.doc.find_one({'_id': ObjectId('5d5779523f5cc0f1bdd8511f')})
 slots = db.doc.find_one({'_id': ObjectId('5d5b51f233ba3bc7166344e3')})
 
 typ = {}
-version = "v1.2.4b"
+version = "v1.2.5"
 
 
 @client.event
@@ -76,8 +76,8 @@ async def on_message(message):
                 bal[user] = 0
             await message.channel.send("<:bfyYes:613851579266760733> 2 <:blobpoint:577932728033476611> have been added to your account.")
             bal[user] += 2
-            channel = client.get_channel(471878672677208084)
-            await channel.send(f"""**Bank Update:** Bal of {user} now {bal[user]}""")
+            channel = client.get_channel(470347448066375681)
+            await channel.send(f"""**Bank Update:** Bal of {str(client.get_user(user))} now {bal[user]}""")
     else:
         if typ[message.author.id] <= 0:
             if lower == "w.help":
@@ -97,7 +97,7 @@ async def on_message(message):
                 if bal[mem] > 1:
                     await message.channel.send("<:bfyYes:613851579266760733> <@266319920009183242> will complete the transaction within 24 hours.")
                     bal[mem] -= 2
-                    channel = client.get_channel(471878672677208084)
+                    channel = client.get_channel(470347448066375681)
                     await channel.send(f"""**Bank Update:** Bal of {truemem} now {bal[mem]}""")
                 else:
                     await message.channel.send("<:bfyNo:613851611600781342> You do not have enough <:blobpoint:577932728033476611> to do so.")
@@ -135,7 +135,7 @@ async def on_message(message):
                         bal[str(user.id)] = 0
                     bal[str(user.id)] += int(say[2])
                     await message.channel.send(f"""<:bfyYes:613851579266760733> **{say[2]}bp** has/have been added to {str(user)}'s balance""")
-                    channel = client.get_channel(471878672677208084)
+                    channel = client.get_channel(470347448066375681)
                     await channel.send(f"""**Bank Update:** Bal of {str(user)} now {bal[str(user.id)]}""")
                 else:
                     await message.channel.send("<:bfyNo:613851611600781342> You do not have the required permissions to use this command.")
@@ -148,7 +148,7 @@ async def on_message(message):
                         bal[str(user.id)] = 0
                     bal[str(user.id)] -= int(say[2])
                     await message.channel.send(f"""<:bfyYes:613851579266760733> **{say[2]}bp** has/have been removed from {str(user)}'s balance""")
-                    channel = client.get_channel(471878672677208084)
+                    channel = client.get_channel(470347448066375681)
                     await channel.send(f"""**Bank Update:** Bal of {str(user)} now {bal[str(user.id)]}""")
                 else:
                     await message.channel.send("<:bfyNo:613851611600781342> You do not have the required permissions to use this command.")
@@ -232,6 +232,8 @@ async def on_message(message):
                             elif rqtype[str(user.id)] == "Custom Emoji Pack":
                                 bal[str(user.id)] += 80
                             await message.channel.send(f"""<:bfyYes:613851579266760733> You have forcefully deleted {str(user)}'s request. You may proceed to delete the message in the queue.""")
+                            channel = client.get_channel(470347448066375681)
+                            await channel.send(f"""**Bank Update:** Bal of {str(user)} now {bal[str(user.id)]}""")
                         else:
                             await message.channel.send("<:bfyNo:613851611600781342> That user has no request in the queue.")
                     else:
@@ -345,6 +347,8 @@ async def on_message(message):
                     bal[str(message.author.id)] -= 10
                 elif rqtype[str(message.author.id)] == "Custom Emoji Pack":
                     bal[str(message.author.id)] -= 80
+                channel = client.get_channel(470347448066375681)
+                await channel.send(f"""**Bank Update:** Bal of {str(message.author)} now {bal[str(message.author.id)]}""")
             else:
                 await message.channel.send("<:bfyNo:613851611600781342> That was not a valid response. Please `confirm` or `cancel`.")
         elif typ[message.author.id] == 5:
@@ -371,6 +375,8 @@ async def on_message(message):
                     bal[str(message.author.id)] += 80
                 channel = client.get_channel(471878672677208084)
                 await channel.send(f"""{str(message.author)} has deleted their request.""")
+                channel = client.get_channel(470347448066375681)
+                await channel.send(f"""**Bank Update:** Bal of {str(message.author)} now {bal[str(message.author.id)]}""")
             else:
                 await message.channel.send("<:bfyNo:613851611600781342> That was not a valid response. Please `confirm` or `cancel`.")
 
