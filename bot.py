@@ -34,10 +34,10 @@ async def on_member_join(member):
     if member.guild == guild:
         await client.change_presence(activity=discord.Activity(name=f"""{guild.member_count} members""", type=discord.ActivityType.watching))
         channel = client.get_channel(469591475999604750)
-        await channel.send(f"""<a:party:582383854262943745> Hey fellow **blob {member.mention}**, welcome to **Blob-ify**! You're the **{member.guild.member_count}th** blob to join our growing blob community! To get started, please check <#470303845495341057>. In order to request a blob, please check <#526232642425978892>. Have fun! <a:wumpusheart:582383394516631552>""")
+        await channel.send(f""":tada: Hey fellow **blob {member.mention}**, welcome to **Blob-ify**! You're the **{member.guild.member_count}th** blob to join our growing blob community! To get started, please check <#470303845495341057>. In order to request a blob, please check <#526232642425978892>. Have fun! :heart:""")
     elif member.guild == guild1:
         channel = client.get_channel(591038750847533058)
-        await channel.send(f"""<a:party:582383854262943745> Hey fellow **blob {member.mention}**, welcome to **{member.guild.name}**! You're the **{member.guild.member_count}th** blob to join our growing blob community! Have fun! <a:wumpusheart:582383394516631552>""")
+        await channel.send(f""":tada: Hey fellow **blob {member.mention}**, welcome to **{member.guild.name}**! You're the **{member.guild.member_count}th** blob to join our growing blob community! Have fun! :heart:""")
 
 
 @client.event
